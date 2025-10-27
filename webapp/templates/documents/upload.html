@@ -1,0 +1,94 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Upload Document{% endblock %}
+
+{% block content %}
+<div class="vh-100 d-flex justify-content-center align-items-center">
+  <div class="col-md-6 col-lg-4">
+    <div class="card shadow-sm">
+    
+      <div class="card-header bg-dark text-white text-center">
+        <h5 class="mb-0">Upload New Document</h5>
+      </div>
+
+   
+      <div class="card-body">
+        <form id="uploadForm" enctype="multipart/form-data">
+          {% csrf_token %}
+
+        
+          <div class="mb-3">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+          </div>
+
+          <div class="mb-3">
+            {{ form.file.label_tag }}
+            {{ form.file }}
+          </div>
+
+          <div class="form-check mb-3"></div>
+            {{ form.shared }}
+            <label class="form-check-label" for="id_shared">Make this document public</label>
+          </div>
+
+          
+          <button type="submit" class="btn btn-primary w-100">
+            Upload
+          </button>
+        </form>
+
+     
+        <div id="uploadStatus" class="mt-3 text-center"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const uploadForm = document.getElementById('uploadForm');
+    const status = document.getElementById('uploadStatus');
+  
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(uploadForm);
+  
+      status.innerHTML = "<div class='text-secondary'>Uploading...</div>";
+  
+      try {
+        const res = await fetch("{% url 'upload_document' %}", {
+          method: "POST",
+          body: formData,
+          headers: { "X-CSRFToken": "{{ csrf_token }}" }
+        });
+  
+        let data;
+        try {
+          data = await res.json();
+        } catch(jsonErr) {
+        
+          
+          data = { success: false, message: `Server returned invalid JSON: ${jsonErr}` };
+        }
+  
+        if (res.ok && data.success) {
+          status.innerHTML = `<div class='text-success'>✅ ${data.message}</div>`;
+          uploadForm.reset();
+        } else {
+        
+          
+          const msg = data.message || `Status code: ${res.status}`;
+          status.innerHTML = `<div class='text-warning'>❌ ${msg}</div>`;
+        }
+  
+      } catch (err) {
+        console.error("Fetch error:", err);
+        status.innerHTML = `<div class='text-danger'>❌ Upload failed: ${err}</div>`;
+      }
+    });
+  });
+  </script>
+  
+{% endblock %}

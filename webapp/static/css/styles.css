@@ -1,0 +1,17 @@
+:root {
+    --bs-primary: #1E1E2F; /* main button color */
+}
+
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: #fff; /* text color */
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: #333333; /* hover color */
+    border-color: #333333;
+    color: #fff;
+}

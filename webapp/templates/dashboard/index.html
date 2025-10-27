@@ -1,0 +1,164 @@
+{% extends "dashboard_base.html" %}
+{% block title %}Dashboard Chat{% endblock %}
+
+{% block content %}
+
+    <div class="row justify-content-center">
+        <div class="col">
+
+            <div class="card shadow-sm">
+                
+                <div class="card-header bg-dark text-white text-center">
+                    <small>Chat with your documents</small>
+                </div>
+
+                
+                <div class="card-body d-flex flex-column" style="min-height: 80vh;">
+
+                
+                    
+                    <div class="welcome-container text-center mb-3">
+                        <p class="lead text-muted">Welcome! Ask your documents anything.</p>
+                        <p class="text-secondary">Try these sample questions:</p>
+                        <div>
+                            <button class="btn btn-outline-dark m-1"
+                                    onclick="askSample('How does US law define breach of contract?')">How does US law define breach of contract?</button>
+                            <button class="btn btn-outline-dark m-1"
+                                    onclick="askSample('What is the nature of the dispute between James Thompson and Apex Corporation?')">What is the nature of the dispute between James Thompson and Apex Corporation?</button>
+                            
+                            <button class="btn btn-outline-dark m-1"
+                                    onclick="askSample('Who are the legal counsels for Apex and GreenTech?')">Who are the legal counsels for Apex and GreenTech?</button>
+                           
+                        </div>
+                    </div>
+                
+
+                    <!-- Chat box -->
+                    <div id="chat-box" class="flex-grow-1 border rounded p-3 mb-3"
+                         style="overflow-y:auto; max-height:70vh; {% if not chat_history %}display:none;{% endif %}">
+                        {% for message in chat_history %}
+                            <div class="d-flex {% if message.role == 'user' %}justify-content-end{% else %}justify-content-start{% endif %} mb-2">
+                                <div class="p-2 rounded"
+                                     style="max-width:75%;
+                                     {% if message.role == 'user' %}background-color:#1E1E2F; color:white;{% else %}background-color:#e2e2e2; color:#000;{% endif %}">
+                                    {{ message.content|linebreaks }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                  
+                    <div id="loader" class="text-center mb-3" style="display:none;">
+                        <div class="spinner-border text-dark" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                  
+                    <form id="chat-form" class="d-flex mt-auto">
+                        {% csrf_token %}
+                        <input type="text" id="question" name="q" class="form-control me-2"
+                               placeholder="Ask something..." autocomplete="off" required>
+                        <button type="submit" class="btn btn-dark">Send</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+const chatBox = document.getElementById("chat-box");
+const chatForm = document.getElementById("chat-form");
+const questionInput = document.getElementById("question");
+const loader = document.getElementById("loader");
+
+
+function askSample(question) {
+    chatBox.style.display = "block";
+    // addMessage(question, 'user');
+    questionInput.value = question;
+    questionInput.focus();
+    questionInput.select()
+}
+
+
+function addMessage(content, role='assistant') {
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("d-flex", "mb-2");
+    wrapper.classList.add(role === 'user' ? "justify-content-end" : "justify-content-start");
+
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("p-2", "rounded");
+    msgDiv.style.maxWidth = "75%";
+    if(role === 'user'){
+        msgDiv.style.backgroundColor = "#1E1E2F";
+        msgDiv.style.color = "white";
+    } else {
+        msgDiv.style.backgroundColor = "#e2e2e2";
+        msgDiv.style.color = "#000";
+    }
+    msgDiv.innerHTML = content;
+
+    wrapper.appendChild(msgDiv);
+    chatBox.appendChild(wrapper);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+
+chatForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const question = questionInput.value.trim();
+    if (!question) return;
+    questionInput.disabled = true;
+    chatForm.querySelector("button[type='submit']").disabled = true;
+
+    chatBox.style.display = "block";
+    addMessage(question, 'user');
+    questionInput.value = '';
+    loader.style.display = "block";
+
+    try {
+        const response = await fetch("{% url 'dashboard_chat' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ question })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            addMessage(data.answer || "No answer.", 'assistant');
+        } else {
+            addMessage("Error fetching response.", 'assistant');
+        }
+    } catch (err) {
+        addMessage("Error: " + err.message, 'assistant');
+    } finally {
+        loader.style.display = "none";
+        questionInput.disabled = false;
+        chatForm.querySelector("button[type='submit']").disabled = false;
+        questionInput.focus(); 
+    }
+});
+
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let c of cookies) {
+            const cookie = c.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

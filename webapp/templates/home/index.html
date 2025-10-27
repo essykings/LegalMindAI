@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+{% block title %}Home - LegalMind AI{% endblock %}
+
+{% block content %}
+<style>
+  .hero-section {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    color: white;
+    padding: 4rem 1rem;
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+    color: #ccc;
+    max-width: 700px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-hero {
+    padding: 0.875rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+
+  .btn-hero-primary {
+    background-color: #fff;
+    color: #0a0a0a;
+    border: none;
+  }
+
+  .btn-hero-primary:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,255,255,0.2);
+  }
+
+  .btn-hero-secondary {
+    background-color: transparent;
+    color: #fff;
+    border: 2px solid #fff;
+  }
+
+  .btn-hero-secondary:hover {
+    background-color: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+  }
+
+  .features-section {
+    padding: 4rem 1rem;
+    background-color: #f8f9fa;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0a0a0a;
+    margin-bottom: 0.5rem;
+  }
+
+  .section-subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 3rem;
+  }
+
+  .feature-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    height: 100%;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    border-color: #0a0a0a;
+  }
+
+  .feature-icon {
+    width: 60px;
+    height: 60px;
+    background: #0a0a0a;
+    color: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .feature-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #0a0a0a;
+    margin-bottom: 0.75rem;
+  }
+
+  .feature-description {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+
+  .feature-link {
+    color: #0a0a0a;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .feature-link:hover {
+    gap: 0.75rem;
+  }
+
+  .stats-section {
+    background: #0a0a0a;
+    color: white;
+    padding: 3rem 1rem;
+    text-align: center;
+  }
+
+  .stat-item {
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    display: block;
+  }
+
+  .stat-label {
+    color: #ccc;
+    font-size: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+    }
+
+    .btn-hero {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+    }
+
+    .feature-card {
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+  }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section">
+  <div class="container">
+    <h1 class="hero-title">
+      Your Legal Documents,<br>Powered by AI
+    </h1>
+    <p class="hero-subtitle">
+      Upload, analyze, and manage legal documents with enterprise-grade security. 
+      Get instant insights with AI-powered chat and keep your team in sync.
+    </p>
+    
+    <div class="cta-buttons">
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard_chat' %}" class="btn btn-hero btn-hero-primary">
+          Go to Dashboard
+        </a>
+      {% else %}
+        <a href="{% url 'signup' %}" class="btn btn-hero btn-hero-primary">
+          Get Started 
+        </a>
+        <a href="{% url 'login' %}" class="btn btn-hero btn-hero-secondary">
+          Login
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+<div class="features-section">
+  <div class="container">
+    <h2 class="section-title">Everything You Need</h2>
+    <p class="section-subtitle">Powerful features designed for legal professionals</p>
+    
+    <div class="row">
+      <!-- Feature 1 -->
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="bi bi-folder"></i>
+          </div>
+          <h3 class="feature-title">Document Management</h3>
+          <p class="feature-description">
+            Upload, organize, and access your legal documents securely from anywhere. Keep everything in one place.
+          </p>
+          {% if user.is_authenticated %}
+            <a href="{% url 'documents' %}" class="feature-link">
+              Open Documents <i class="bi bi-arrow-right"></i>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="bi bi-chat-dots"></i>
+          </div>
+          <h3 class="feature-title">AI Assistant</h3>
+          <p class="feature-description">
+            Ask questions about your documents, get summaries, extract key clauses, and understand complex legal text instantly.
+          </p>
+          {% if user.is_authenticated %}
+            <a href="{% url 'dashboard_chat' %}" class="feature-link">
+              Start Chatting <i class="bi bi-arrow-right"></i>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h3 class="feature-title">Secure Sharing</h3>
+          <p class="feature-description">
+            Share documents with team members and clients with granular access controls. Track who views what, when.
+          </p>
+          {% if user.is_authenticated %}
+            <a href="{% url 'public_documents' %}" class="feature-link">
+              View Shared <i class="bi bi-arrow-right"></i>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+    
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="bi bi-journal-text"></i>
+          </div>
+          <h3 class="feature-title">Audit Logs</h3>
+          <p class="feature-description">
+            Complete activity tracking for compliance and security. Every action is logged and timestamped automatically.
+          </p>
+          {% if user.is_authenticated %}
+            <a href="{% url 'user_audit_logs' %}" class="feature-link">
+              View Logs <i class="bi bi-arrow-right"></i>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% if user.is_authenticated %}
+<div class="stats-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <span class="stat-number">{{ documents_count|default:"0" }}</span>
+          <span class="stat-label">Documents</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <span class="stat-number">{{ chats_count|default:"0" }}</span>
+          <span class="stat-label">AI Conversations</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <span class="stat-number">{{ shared_count|default:"0" }}</span>
+          <span class="stat-label">Shared Files</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <span class="stat-number">24/7</span>
+          <span class="stat-label">AI Available</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+
+<div class="container py-4 text-center">
+  {% if user.is_authenticated %}
+    <p class="text-muted small mb-0">
+      Logged in as <strong>{{ user.email }}</strong>
+    </p>
+  {% else %}
+    <p class="text-muted small mb-0">
+      Ready to get started? <a href="{% url 'signup' %}" class="text-decoration-none" style="color: #0a0a0a; font-weight: 600;">Create your account</a>
+    </p>
+  {% endif %}
+</div>
+
+{% endblock %}

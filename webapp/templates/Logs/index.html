@@ -1,0 +1,146 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+{% load to_pretty_json %}
+
+{% block title %}Audit Logs{% endblock %}
+
+{% block content %}
+<style>
+  .log-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background: white;
+    overflow: hidden;
+  }
+  
+  .log-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .log-header {
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    transition: background-color 0.2s;
+  }
+  
+  .log-header:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .log-info {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .log-question {
+    font-weight: 500;
+    margin: 0 0 0.25rem 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .log-timestamp {
+    color: #666;
+    font-size: 0.85rem;
+  }
+  
+  .log-toggle {
+    color: #666;
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+  }
+  
+  .log-card.expanded .log-toggle {
+    transform: rotate(180deg);
+  }
+  
+  .log-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  
+  .log-card.expanded .log-content {
+    max-height: 500px;
+    overflow: auto;
+  }
+  
+  .log-details {
+    padding: 1.25rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+  }
+  
+  .log-details pre {
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 0;
+    max-height: 400px;
+    overflow: auto;
+    font-size: 0.85rem;
+    border: 1px solid #e0e0e0;
+  }
+  
+  @media (max-width: 576px) {
+    .log-header {
+      padding: 0.875rem 1rem;
+    }
+    
+    .log-question {
+      font-size: 0.9rem;
+    }
+    
+    .log-timestamp {
+      font-size: 0.8rem;
+    }
+  }
+</style>
+
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0">Audit Logs</h5>
+    </div>
+
+    <div class="card-body">
+      {% if logs_data %}
+        {% for log in logs_data %}
+          <div class="log-card" id="log{{ forloop.counter }}">
+            <div class="log-header" onclick="toggleLog({{ forloop.counter }})">
+              <div class="log-info">
+                <p class="log-question">{{ log.question|truncatechars:80 }}</p>
+                <small class="log-timestamp">
+                  <i class="bi bi-clock"></i> {{ log.timestamp|date:"M d, Y - H:i" }}
+                </small>
+              </div>
+              <i class="bi bi-chevron-down log-toggle"></i>
+            </div>
+            
+            <div class="log-content">
+              <div class="log-details">
+                <pre>{{ log|to_pretty_json|safe }}</pre>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-center text-muted py-4">No audit logs found.</p>
+      {% endif %}
+    </div>
+  </div>
+
+
+<script>
+function toggleLog(id) {
+  const card = document.getElementById('log' + id);
+  card.classList.toggle('expanded');
+}
+</script>
+{% endblock %}

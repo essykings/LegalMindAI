@@ -1,0 +1,79 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Public Documents{% endblock %}
+
+{% block content %}
+<style>
+  .doc-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .doc-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .doc-info h6 {
+    margin: 0 0 0.25rem 0;
+    font-weight: 600;
+  }
+  
+  .doc-info small {
+    color: #666;
+  }
+  
+  .doc-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  @media (max-width: 576px) {
+    .doc-card {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .doc-actions {
+      width: 100%;
+    }
+    
+    .doc-actions .btn {
+      flex: 1;
+    }
+  }
+</style>
+
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Public Documents</h5>
+      <a href="{% url 'upload_document' %}" class="btn btn-sm btn-outline-light">Upload New</a>
+    </div>
+
+    <div class="card-body">
+      {% for doc in documents %}
+        <div class="doc-card">
+          <div class="doc-info">
+            <h6>{{ doc.title }}</h6>
+            <small><i class="bi bi-calendar3"></i> {{ doc.created_at|date:"M d, Y" }}</small>
+          </div>
+          
+          <div class="doc-actions">
+            <a href="{% url 'pdf_page' doc.id %}" target="_blank" class="btn btn-sm btn-outline-dark">View</a>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-center text-muted py-4">No public documents.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+{% endblock %}
